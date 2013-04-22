@@ -1,8 +1,7 @@
-pomelo-cocos2dChat
+pomelo-cocos2dchat
 ==================
 This is a chat application based on [libpomelo](https://github.com/NetEase/libpomelo) and [cocos2d-x](https://github.com/cocos2d/cocos2d-x),  
 the server side is [chatofpomelo-websocket](https://github.com/NetEase/chatofpomelo-websocket).  
-
 
 ##License
 (The MIT License)
