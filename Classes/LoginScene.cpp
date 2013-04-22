@@ -11,22 +11,24 @@
 USING_NS_CC;
 USING_NS_CC_EXT;
 
-static const char *connectorHost = NULL;
+#define GATE_HOST "127.0.0.1"
+
+static const char* connectorHost = "";
 static int connectorPort = 0;
 static std::string username = "";
 static std::string channel = "";
-static pc_client_t *pomelo_client = NULL;
-static CCArray *messageQueue = NULL;
-static CCArray *userQueue = NULL;
+static pc_client_t* pomelo_client = NULL;
+static CCArray* messageQueue = NULL;
+static CCArray* userQueue = NULL;
 static int error = 0;
-static json_t *userList = NULL;
+static json_t* userList = NULL;
 
 static void on_close(pc_client_t *client, const char *event, void *data);
 
 void Login::onChatCallback(pc_client_t *client, const char *event, void *data)
 {
-    json_t *json = (json_t * )data;
-    const char *msg = json_dumps(json, 0);
+    json_t* json = (json_t* )data;
+    const char* msg = json_dumps(json, 0);
     CCLOG("%s %s", event, msg);
     messageQueue->addObject(CCString::create(msg));
     return;
@@ -34,13 +36,12 @@ void Login::onChatCallback(pc_client_t *client, const char *event, void *data)
 
 void Login::onAddCallback(pc_client_t *client, const char *event, void *data)
 {
-    if (!userQueue)
-    {
+    if (!userQueue) {
         return;
     }
-    json_t *json = (json_t * )data;
-    json_t *user = json_object_get(json, "user");
-    const char *msg = json_string_value(user);
+    json_t* json = (json_t* )data;
+    json_t* user = json_object_get(json, "user");
+    const char* msg = json_string_value(user);
     CCLOG("%s %s", event, msg);
     userQueue->addObject(CCString::create(msg));
     return;
@@ -48,19 +49,16 @@ void Login::onAddCallback(pc_client_t *client, const char *event, void *data)
 
 void Login::onLeaveCallback(pc_client_t *client, const char *event, void *data)
 {
-    if (!userQueue)
-    {
+    if (!userQueue) {
         return;
     }
-    json_t *json = (json_t * )data;
-    json_t *user = json_object_get(json, "user");
-    const char *msg = json_string_value(user);
-    CCLOG("%s %s", event, msg);
-    for (unsigned int i = 0; i < userQueue->count(); i++)
-    {
-        CCString *cstring = (CCString * )userQueue->objectAtIndex(i);
-        if (strcmp(cstring->getCString(), msg) == 0)
-        {
+    json_t* json = (json_t* )data;
+    json_t* user = json_object_get(json, "user");
+    const char* msg = json_string_value(user);
+    CCLOG("%s %s", event,msg);
+    for (unsigned int i=0; i<userQueue->count(); i++) {
+        CCString* cstring = (CCString* )userQueue->objectAtIndex(i);
+        if (strcmp(cstring->getCString(),msg) == 0) {
             userQueue->removeObjectAtIndex(i);
             break;
         }
@@ -76,15 +74,12 @@ void Login::onDisconnectCallback(pc_client_t *client, const char *event, void *d
 
 void Login::requstGateCallback(pc_request_t *req, int status, json_t *resp)
 {
-    if (status == -1)
-    {
+    if(status == -1) {
         CCLOG("Fail to send request to server.\n");
-    }
-    else if (status == 0)
-    {
+    } else if(status == 0) {
         connectorHost = json_string_value(json_object_get(resp, "host"));
         connectorPort = json_number_value(json_object_get(resp, "port"));
-        CCLOG("%s %d", connectorHost, connectorPort);
+        CCLOG("%s %d", connectorHost,connectorPort);
         pc_client_t *client = pc_client_new();
 
         struct sockaddr_in address;
@@ -95,10 +90,10 @@ void Login::requstGateCallback(pc_request_t *req, int status, json_t *resp)
         address.sin_addr.s_addr = inet_addr(connectorHost);
 
         // add pomelo events listener
-        void (*on_disconnect)(pc_client_t * client, const char * event, void * data) = &Login::onDisconnectCallback;
-        void (*on_chat)(pc_client_t * client, const char * event, void * data) = &Login::onChatCallback;
-        void (*on_add)(pc_client_t * client, const char * event, void * data) = &Login::onAddCallback;
-        void (*on_leave)(pc_client_t * client, const char * event, void * data) = &Login::onLeaveCallback;
+        void (*on_disconnect)(pc_client_t *client, const char *event, void *data) = &Login::onDisconnectCallback;
+        void (*on_chat)(pc_client_t *client, const char *event, void *data) = &Login::onChatCallback;
+        void (*on_add)(pc_client_t *client, const char *event, void *data) = &Login::onAddCallback;
+        void (*on_leave)(pc_client_t *client, const char *event, void *data) = &Login::onLeaveCallback;
 
         pc_add_listener(client, "disconnect", on_disconnect);
         pc_add_listener(client, "onChat", on_chat);
@@ -106,8 +101,7 @@ void Login::requstGateCallback(pc_request_t *req, int status, json_t *resp)
         pc_add_listener(client, "onLeave", on_leave);
 
         // try to connect to server.
-        if (pc_client_connect(client, &address))
-        {
+        if(pc_client_connect(client, &address)) {
             CCLOG("fail to connect server.\n");
             pc_client_destroy(client);
             return ;
@@ -124,16 +118,16 @@ void Login::requstGateCallback(pc_request_t *req, int status, json_t *resp)
         json_decref(channel_str);
 
         pc_request_t *request = pc_request_new();
-        void (*connect_cb)(pc_request_t * req, int status, json_t * resp ) = &Login::requstConnectorCallback;
+        void (*connect_cb)(pc_request_t *req, int status, json_t *resp )= &Login::requstConnectorCallback;
         pc_request(client, request, route, msg, connect_cb);
-
-        /*
+		
+		/*
         char *json_str = json_dumps(resp, 0);
         if(json_str != NULL) {
             CCLOG("server response: %s %d\n", connectorHost, connectorPort);
             free(json_str);
         }
-        */
+		*/
     }
 
     // release relative resource with pc_request_t
@@ -148,26 +142,21 @@ void Login::requstGateCallback(pc_request_t *req, int status, json_t *resp)
 void Login::requstConnectorCallback(pc_request_t *req, int status, json_t *resp)
 {
     error = 0;
-    if (status == -1)
-    {
+    if(status == -1) {
         CCLOG("Fail to send request to server.\n");
-    }
-    else if (status == 0)
-    {
+    } else if(status == 0) {
         char *json_str = json_dumps(resp, 0);
         CCLOG("server response: %s \n", json_str);
-        json_t *users = json_object_get(resp, "users");
-        if (json_object_get(resp, "error") != NULL)
-        {
+		json_t* users = json_object_get(resp,"users");
+        if(json_object_get(resp, "error") != NULL) {
             error = 1;
             CCLOG("connect error %s", json_str);
             free(json_str);
             return;
         }
         pomelo_client = req->client;
-        for (unsigned int i = 0; i < json_array_size(users); i++)
-        {
-            json_t *val = json_array_get(users, i);
+        for (unsigned int i=0; i<json_array_size(users); i++) {
+            json_t* val = json_array_get(users,i);
             userQueue->addObject(CCString::create(json_string_value(val)));
         }
     }
@@ -187,7 +176,7 @@ void on_close(pc_client_t *client, const char *event, void *data)
 
 void Login::doLogin()
 {
-    const char *ip = "127.0.0.1";
+    const char *ip = GATE_HOST;
     int port = 3014;
 
     pc_client_t *client = pc_client_new();
@@ -203,8 +192,7 @@ void Login::doLogin()
     pc_add_listener(client, PC_EVENT_DISCONNECT, on_close);
 
     // try to connect to server.
-    if (pc_client_connect(client, &address))
-    {
+    if(pc_client_connect(client, &address)) {
         CCLOG("fail to connect server.\n");
         pc_client_destroy(client);
         return ;
@@ -218,7 +206,7 @@ void Login::doLogin()
     json_decref(str);
 
     pc_request_t *request = pc_request_new();
-    void (*on_request_gate_cb)(pc_request_t * req, int status, json_t * resp) = &Login::requstGateCallback;
+    void (*on_request_gate_cb)(pc_request_t *req, int status, json_t *resp) = &Login::requstGateCallback;
     pc_request(client, request, route, msg, on_request_gate_cb);
 
     // main thread has nothing to do and wait until child thread return.
@@ -231,8 +219,7 @@ void Login::doLogin()
 CCScene *Login::scene()
 {
     CCScene *scene = NULL;
-    do
-    {
+    do {
         // 'scene' is an autorelease object
         scene = CCScene::create();
         CC_BREAK_IF(! scene);
@@ -241,8 +228,7 @@ CCScene *Login::scene()
         CC_BREAK_IF(! layer);
         // add layer as a child to scene
         scene->addChild(layer);
-    }
-    while (0);
+    } while (0);
     // return the scene
     return scene;
 }
@@ -266,8 +252,7 @@ void Login::onEnter()
 bool Login::init()
 {
     bool bRet = false;
-    do
-    {
+    do {
         CC_BREAK_IF(! CCLayer::init());
         CCPoint visibleOrigin = CCEGLView::sharedOpenGLView()->getVisibleOrigin();
         CCSize visibleSize = CCEGLView::sharedOpenGLView()->getVisibleSize();
@@ -327,23 +312,21 @@ bool Login::init()
         this->addChild(pSprite, 0);
 
         bRet = true;
-    }
-    while (0);
+    } while (0);
     return bRet;
 }
 
 void Login::dispatchLoginCallbacks(float delta)
 {
     // wait for pomelo_client init from connector callback
-    if (pomelo_client == NULL || error == 1)
-    {
+    if(pomelo_client == NULL || error == 1) {
         return;
     }
 
     CCDirector::sharedDirector()->getScheduler()->pauseTarget(this);
 
-    CCScene *pScene = CCScene::create();
-    Chat *pLayer = new Chat();
+    CCScene* pScene = CCScene::create();
+    Chat* pLayer = new Chat();
     pLayer->setChannel(channel);
     pLayer->setUser(username);
     pLayer->setClient(pomelo_client);
@@ -351,15 +334,12 @@ void Login::dispatchLoginCallbacks(float delta)
     pLayer->setMessageQueue(messageQueue);
 
     CCLOG("init player");
-    if (pLayer && pLayer->init())
-    {
+    if(pLayer && pLayer->init()) {
         //pLayer->autorelease();
         pScene->addChild(pLayer);
         CCLOG("director replaceScene");
         CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(1, pScene));
-    }
-    else
-    {
+    } else {
         delete pLayer;
         pLayer = NULL;
     }
@@ -382,13 +362,10 @@ void Login::editBoxEditingDidEnd(cocos2d::extension::CCEditBox *editBox)
 
 void Login::editBoxTextChanged(cocos2d::extension::CCEditBox *editBox, const std::string &text)
 {
-    if (editBox == m_pEditName)
-    {
+    if (editBox == m_pEditName) {
         username = text;
         CCLog("name editBox %p TextChanged, text: %s ", editBox, text.c_str());
-    }
-    else
-    {
+    } else {
         channel = text;
         CCLog("channel editBox %p TextChanged, text: %s ", editBox, text.c_str());
     }
