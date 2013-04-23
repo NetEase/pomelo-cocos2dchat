@@ -3,6 +3,18 @@ pomelo-cocos2dchat
 This is a chat application based on [libpomelo](https://github.com/NetEase/libpomelo) and [cocos2d-x](https://github.com/cocos2d/cocos2d-x),  
 the server side is [chatofpomelo-websocket](https://github.com/NetEase/chatofpomelo-websocket).  
 
+##Windows  
+open projects in proj.win32 with vistual studio and import libpomelo projects , then build and run    
+
+##Android
+use cocos2d-x create-android-project.bat(sh) to generate a new android project  
+put libpomelo in ${COCOS2DX_ROOT}/cocos2dx/platform/third_party/android/prebuilt path  
+replace Android.mk in the jni directory  
+then run ./build_native.sh in your android project  
+
+##IOS
+
+
 ##License
 (The MIT License)
 
