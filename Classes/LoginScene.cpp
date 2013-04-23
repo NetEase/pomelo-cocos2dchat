@@ -11,7 +11,10 @@
 USING_NS_CC;
 USING_NS_CC_EXT;
 
-#define GATE_HOST "127.0.0.1"
+#define GATE_HOST "114.113.202.141"
+#define GATE_PORT 3088
+//#define GATE_HOST "127.0.0.1"
+//#define GATE_PORT 3014
 
 static const char* connectorHost = "";
 static int connectorPort = 0;
@@ -175,9 +178,9 @@ void on_close(pc_client_t *client, const char *event, void *data)
 }
 
 void Login::doLogin()
-{
+{	
     const char *ip = GATE_HOST;
-    int port = 3014;
+    int port = GATE_PORT;
 
     pc_client_t *client = pc_client_new();
 
@@ -188,15 +191,15 @@ void Login::doLogin()
     address.sin_port = htons(port);
     address.sin_addr.s_addr = inet_addr(ip);
 
-    // add some event callback.
-    pc_add_listener(client, PC_EVENT_DISCONNECT, on_close);
-
     // try to connect to server.
     if(pc_client_connect(client, &address)) {
         CCLOG("fail to connect server.\n");
         pc_client_destroy(client);
         return ;
     }
+	
+	// add some event callback.
+	pc_add_listener(client, PC_EVENT_DISCONNECT, on_close);
 
     const char *route = "gate.gateHandler.queryEntry";
     json_t *msg = json_object();
