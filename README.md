@@ -7,13 +7,21 @@ the server side is [chatofpomelo-websocket](https://github.com/NetEase/chatofpom
 open projects in proj.win32 with vistual studio and import libpomelo projects , then build and run    
 
 ##Android
-use cocos2d-x create-android-project.bat(sh) to generate a new android project  
-copy files in Classes and Resources into android project with the same directory  
-put libpomelo in ${COCOS2DX_ROOT}/cocos2dx/platform/third_party/android/prebuilt path  
-replace Android.mk in the jni directory  
-then run ./build_native.sh in your android project  
+* Use cocos2d-x create-android-project.bat(sh) to generate a new android project.
+* Copy files in Classes and Resources to the android.
+* Put libpomelo in`${COCOS2DX_ROOT}/cocos2dx/platform/third_party/android/prebuilt` path.  
+* Replace `Android.mk` in the jni directory.  
+* Run `./build_native.sh` in your android project.
 
 ##IOS
+
+* Create a cocos2d-x project in xcode.
+* Copy files in `Classes/` and `Resources` to the project.
+* Build the libaries of `libpomelo` for [ios](https://github.com/NetEase/libpomelo#ios) or [ios simulator](https://github.com/NetEase/libpomelo#ios-simulator).
+* Configure project
+	* Add include path: add `LIBPOMELO_ROOT/include`, `LIBPOMELO_ROOT/deps/uv/incude` and `LIBPOMELO_ROOT/deps/jansson/src` to the `User Header Search Paths` of project.
+	* Add library path: add `libpomelo` libraries paths to the `Library Search Paths` of project. For example: `LIBPOMELO_ROOT/build/Default-iphonesimulator`, `LIBPOMELO_ROOT/deps/uv/build/Default-iphonesimulator` and `LIBPOMELO_ROOT/deps/jansson/build/Default-iphonesimulator`.
+	* Add linker flags: add `-ljansson`, `-luv` and `-lpomelo` to the `Other Linker Flags` of project. 
 
 
 ##License
