@@ -19,7 +19,7 @@ open projects in proj.win32 with vistual studio and import libpomelo projects , 
 * Copy files in `Classes/` and `Resources` to the project.
 * Build the libaries of `libpomelo` for [ios](https://github.com/NetEase/libpomelo#ios) or [ios simulator](https://github.com/NetEase/libpomelo#ios-simulator).
 * Configure project
-	* Add include path: add `LIBPOMELO_ROOT/include`, `LIBPOMELO_ROOT/deps/uv/incude` and `LIBPOMELO_ROOT/deps/jansson/src` to the `User Header Search Paths` of project.
+	* Add include path: add `LIBPOMELO_ROOT/include`, `LIBPOMELO_ROOT/deps/uv/include` and `LIBPOMELO_ROOT/deps/jansson/src` to the `User Header Search Paths` of project.
 	* Add library path: add `libpomelo` libraries paths to the `Library Search Paths` of project. For example: `LIBPOMELO_ROOT/build/Default-iphonesimulator`, `LIBPOMELO_ROOT/deps/uv/build/Default-iphonesimulator` and `LIBPOMELO_ROOT/deps/jansson/build/Default-iphonesimulator`.
 	* Add linker flags: add `-ljansson`, `-luv` and `-lpomelo` to the `Other Linker Flags` of project. 
 
